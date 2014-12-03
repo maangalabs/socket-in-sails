@@ -1,4 +1,3 @@
-socket-in-sails
-===============
+# socket-in-sails
 
-Sockets in Sails
+a [Sails](http://sailsjs.org) application
