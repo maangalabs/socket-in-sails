@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html >
+<head>
+	<title>Sails Socket Demo - Maangalabs</title>
+	<link rel="stylesheet" type="text/css" href="/styles/bootstrap.min.css">
+	<style type="text/css">
+	body{
+		background: #ededed;
+	}
+	.navbar{
+		border-radius: 0px;
+	}
+	.form_chat{
+		padding:10px;
+	}
+	</style>
+</head>
+<body ng-app="socketApp" ng-controller="ChatController">
+
+	<div class="navbar navbar-default navbar-fixed-top">
+	  <div class="navbar-header">
+	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+	      <span class="icon-bar"></span>
+	      <span class="icon-bar"></span>
+	      <span class="icon-bar"></span>
+	    </button>
+	    <a class="navbar-brand" href="#">Socket Sails Demo - Maangalabs</a>
+	  </div>
+	</div>
+	<div class="col-md-12" style="padding:100px">
+		<table>
+			<tr ng-repeat="chat in chatList">
+				<td>{{ chat.id }}</td>
+				<td>{{ chat.message }}</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="navbar navbar-inverse navbar-fixed-bottom" >
+	  <div class="col-lg-12">
+	    
+	    <form class="form_chat">
+	      <input type="text" ng-model = "chatMessage" class="form-control col-lg-8" placeholder="Search">
+          <button class="btn btn-default col-lg-3" ng-click="sendMsg()">Send</button>  
+	    </form>
+	    
+	  </div>
+	</div>
+	<script type="text/javascript" src="/js/dependencies/sails.io.js"></script>
+	<script type="text/javascript">
+	</script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.27/angular.min.js"></script>
+	<script type="text/javascript">
+
+		var socketApp = angular.module('socketApp',[]);
+
+		socketApp.controller('ChatController',['$http','$log','$scope',function($http,$log,$scope){
+
+			$scope.baseUrl = 'http://localhost:1337';
+			$scope.chatList =[];
+			$scope.getAllchat = function(){
+
+				io.socket.get('/chat/addconv');
+
+				$http.get($scope.baseUrl+'/chat')
+					 .success(function(success_data){
+
+					 		$scope.chatList = success_data;
+					 		$log.info(success_data);
+					 });
+			};
+
+			$scope.getAllchat();
+
+			$scope.chatMessage="";
+
+			io.socket.on('chat',function(data){
+				$log.info(data.data);
+				$scope.chatList.push(data.data);
+			});
+
+			$scope.sendMsg = function(){
+				$log.info($scope.chatMessage);
+
+				io.socket.post('/chat/addconv/',{message: $scope.chatMessage},function(data){
+					console.log('Send Message '+data);
+				})
+
+			};
+		}]);
+	</script>
+</body>
+</html>
