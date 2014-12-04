@@ -17,7 +17,8 @@ module.exports = {
 			// So add new conversation
 			Chat.create(data_from_client)
 				.exec(function(error,data_from_client){
-					Chat.publishCreate({id: data_from_client.id, data:data_from_client});
+					console.log(data_from_client);
+					Chat.publishCreate({id: data_from_client.id, message : data_from_client.message , user:data_from_client.user});
 				}); 
 		}
 		else if(req.isSocket){

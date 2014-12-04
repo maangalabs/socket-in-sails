@@ -7,13 +7,17 @@
 
 module.exports = {
 
-  attributes: {
+	attributes: {
 
+		user:{
+			type:'string',
+			required:true
+		},
   		message:{
   			type:'string',
   			required:true
   		}
   		
-  }
+	}
 };
 

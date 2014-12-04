@@ -6,6 +6,8 @@
 	<style type="text/css">
 	body{
 		background: #ededed;
+		font-family: 'Open Sans', sans-serif;
+
 	}
 	.navbar{
 		border-radius: 0px;
@@ -13,25 +15,63 @@
 	.form_chat{
 		padding:10px;
 	}
+	.form-control{
+		width: inherit;
+	}
+	.chat_message{
+		padding: 10px;
+		color: #000;
+		font-size: 15px;
+		background: #fff;
+		font-family: 'Open Sans', sans-serif;
+	}
+	.td_class{
+		word-break:break-all;
+		padding: 34px;
+		padding-bottom: 0px;
+		padding-top: 20px;
+		border:0;
+	}
+	.navbar-brand{
+		font-size: 14px;
+		font-weight: 600;
+		text-decoration: none;
+	}
+	.user_name{
+		padding-bottom: 0;
+		color: #fff;
+		font-size: 15px;
+	}
+	.col-lg-4,.col-lg-6{
+		padding-right: 3px;
+		padding-left: 3px;
+	}
+
 	</style>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,600' rel='stylesheet' type='text/css'>
 </head>
 <body ng-app="socketApp" ng-controller="ChatController">
 
 	<div class="navbar navbar-default navbar-fixed-top">
-	  <div class="navbar-header">
-	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-	      <span class="icon-bar"></span>
-	      <span class="icon-bar"></span>
-	      <span class="icon-bar"></span>
-	    </button>
-	    <a class="navbar-brand" href="#">Socket Sails Demo - Maangalabs</a>
-	  </div>
+		<div class="navbar-header">
+	    	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+	    		<span class="icon-bar"></span>
+	    		<span class="icon-bar"></span>
+	    		<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">Socket Sails Demo - Maangalabs</a>
+		</div>
+		 <div class="navbar-collapse collapse navbar-responsive-collapse">
+		     <ul class="nav navbar-nav navbar-right">
+		      <li><a href="#"><strong>Go to the tutorial Page >> &nbsp;&nbsp;&nbsp;</strong></a></li>
+		      
+		    </ul>
+		  </div>
 	</div>
 	<div class="col-md-12" style="padding:100px">
-		<table>
-			<tr ng-repeat="chat in chatList">
-				<td>{{ chat.id }}</td>
-				<td>{{ chat.message }}</td>
+		<table  class="table">
+			<tr class="chat_message" ng-repeat="chat in chatList | orderBy:predicate:reverse | limitTo: 15">
+				<td class="col-md-12 td_class"><strong>{{ chat.user }} : </strong> {{ chat.message }}</td>
 			</tr>
 		</table>
 	</div>
@@ -40,8 +80,14 @@
 	  <div class="col-lg-12">
 	    
 	    <form class="form_chat">
-	      <input type="text" ng-model = "chatMessage" class="form-control col-lg-8" placeholder="Search">
-          <button class="btn btn-default col-lg-3" ng-click="sendMsg()">Send</button>  
+	    	<div class="col-lg-4 col-md-3">
+	      		<input type="text" ng-model = "chatUser" class="form-control" placeholder="TypeYourNameHere">
+          	</div>
+          	
+	    	<div class="col-lg-6 col-md-5">
+	      		<input type="text" ng-model = "chatMessage" class="form-control" placeholder="TypeYourMessageHere">
+          	</div>
+          	<button class="btn btn-default col-lg-2 col-md-2" ng-click="sendMsg()">Send</button>  
 	    </form>
 	    
 	  </div>
@@ -56,6 +102,9 @@
 
 		socketApp.controller('ChatController',['$http','$log','$scope',function($http,$log,$scope){
 
+
+			$scope.predicate = '-id';
+			$scope.reverse = false;
 			$scope.baseUrl = 'http://localhost:1337';
 			$scope.chatList =[];
 			$scope.getAllchat = function(){
@@ -71,21 +120,23 @@
 			};
 
 			$scope.getAllchat();
-
+			$scope.chatUser = "nikkyBot"
 			$scope.chatMessage="";
 
-			io.socket.on('chat',function(data){
-				$log.info(data.data);
-				$scope.chatList.push(data.data);
+			io.socket.on('chat',function(obj){
+
+				if(obj.verb === 'created'){
+					$log.info(obj)
+					$scope.chatList.push(obj.data);
+					$scope.$digest();
+				}
+
 			});
 
 			$scope.sendMsg = function(){
 				$log.info($scope.chatMessage);
-
-				io.socket.post('/chat/addconv/',{message: $scope.chatMessage},function(data){
-					console.log('Send Message '+data);
-				})
-
+				io.socket.post('/chat/addconv/',{user:$scope.chatUser,message: $scope.chatMessage});
+				$scope.chatMessage = "";
 			};
 		}]);
 	</script>
