@@ -1,3 +1,4 @@
-# socket-in-sails
+# Socket in Sails
 
-a [Sails](http://sailsjs.org) application
+A chat application built on Sails with Angular and Sockets. 
+![Sails Angular Socket](/assets/images/sock-4.png)
